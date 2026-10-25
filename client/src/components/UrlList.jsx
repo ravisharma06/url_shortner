@@ -7,21 +7,33 @@ const UrlList = ({ refreshTrigger }) => {
 
   const [urls, setUrls] = useState([]);
   const [qrCodes, setQrCodes] = useState({});
+  const [pendingDelete, setPendingDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
+  const handleDelete = async () => {
+    if (!pendingDelete) return;
 
-
-
-
-  const handleDelete = async (shortCode) => {
-
+    setIsDeleting(true);
+    setDeleteError('');
     try {
-      await api.delete(`/url/${shortCode}`);
-
-
-      setUrls((prevUrls) => prevUrls.filter(url => url.shortCode !== shortCode));
-
+      await api.delete(`/url/${pendingDelete.shortCode}`);
+      setUrls((prevUrls) =>
+        prevUrls.filter((url) => url.shortCode !== pendingDelete.shortCode),
+      );
+      setQrCodes((previousQrCodes) => {
+        const nextQrCodes = { ...previousQrCodes };
+        delete nextQrCodes[pendingDelete.shortCode];
+        return nextQrCodes;
+      });
+      setPendingDelete(null);
     } catch (error) {
-      console.log('Error deleting URL:', error);
+      console.error('Error deleting URL:', error);
+      setDeleteError(
+        error.response?.data?.message ?? 'Could not delete the link. Please try again.',
+      );
+    } finally {
+      setIsDeleting(false);
     }
   }
 
@@ -120,7 +132,10 @@ const UrlList = ({ refreshTrigger }) => {
                       Generate QR code
                     </button>
                     <button
-                      onClick={() => handleDelete(url.shortCode)}
+                      onClick={() => {
+                        setPendingDelete(url);
+                        setDeleteError('');
+                      }}
                       type="button"
                       className="cursor-pointer rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-600 transition hover:bg-red-50"
                     >
@@ -148,6 +163,58 @@ const UrlList = ({ refreshTrigger }) => {
         )}
       </div>
 
+      {pendingDelete && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !isDeleting) {
+              setPendingDelete(null);
+            }
+          }}
+        >
+          <section
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="delete-dialog-title"
+            aria-describedby="delete-dialog-description"
+            className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
+          >
+            <h2 id="delete-dialog-title" className="text-lg font-semibold text-slate-900">
+              Delete this link?
+            </h2>
+            <p id="delete-dialog-description" className="mt-2 text-sm text-slate-600">
+              This will permanently delete{' '}
+              <span className="font-medium text-slate-800">
+                {shortUrlBase}/{pendingDelete.shortCode}
+              </span>
+              .
+            </p>
+            {deleteError && (
+              <p role="alert" className="mt-3 text-sm text-red-600">
+                {deleteError}
+              </p>
+            )}
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={() => setPendingDelete(null)}
+                className="cursor-pointer rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={handleDelete}
+                className="cursor-pointer rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isDeleting ? 'Deleting…' : 'Delete link'}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
     </section>
   )
 }
