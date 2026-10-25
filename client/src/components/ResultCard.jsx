@@ -24,23 +24,25 @@ const ResultCard = ({ url }) => {
   return (
     <section
       aria-labelledby="result-heading"
-      className="border-t border-gray-200 pt-6"
+      className="border-t border-blue-100 bg-blue-50/70 px-5 py-5 sm:px-8"
     >
-      <h2 id="result-heading" className="mb-3 text-sm font-medium text-gray-700">
+      <h2 id="result-heading" className="mb-3 text-sm font-semibold text-slate-700">
         Your shortened link
       </h2>
 
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <a
           href={url.shortUrl}
-          className="min-w-0 flex-1 break-all rounded-md bg-gray-50 px-3 py-2.5 text-sm text-blue-700"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="min-w-0 flex-1 break-all rounded-xl border border-blue-100 bg-white px-4 py-3 text-sm font-medium text-blue-700"
         >
           {url.shortUrl}
         </a>
         <button
           type="button"
           onClick={handleCopy}
-          className="rounded-md cursor-pointer border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+          className="cursor-pointer rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
         >
           {copyStatus === 'copied' ? 'Copied!' : 'Copy'}
         </button>

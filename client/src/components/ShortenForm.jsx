@@ -42,29 +42,30 @@ const ShortenForm = ({ onShortened }) => {
     <section>
       <label
         htmlFor="long-url"
-        className="mb-2 block text-sm font-medium text-gray-700"
+        className="mb-2 block text-sm font-semibold text-slate-700"
       >
         Long URL
       </label>
-      <div className="flex flex-col gap-2 sm:flex-row">
-        <form onSubmit={handleSubmit} className="flex flex-1 gap-2">
+      <div>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:flex-row">
           <input
             ref={inputRef}
             id="long-url"
             type="url"
             placeholder="https://example.com/your-long-link"
-            className="min-w-0 flex-1 rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-900 outline-none placeholder:text-gray-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+            className="min-w-0 flex-1 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
           />
           <button
             type="submit"
-            className="rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            disabled={isSubmitting}
+            className="rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-200 disabled:cursor-not-allowed disabled:opacity-60 sm:min-w-32"
           >
             {isSubmitting ? 'Shortening…' : 'Shorten'}
           </button>
         </form>
       </div>
       <p className="mt-2 text-xs text-gray-500">
-        Enter a URL beginning with http:// or https://
+        Enter a complete URL beginning with http:// or https://.
       </p>
       {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
     </section>
