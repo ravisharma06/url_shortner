@@ -1,5 +1,8 @@
 import Url from '../models/url.model.js';
 import { generateCode } from '../utils/generateCode.js';
+import { fileURLToPath } from 'node:url';
+
+const notFoundPage = fileURLToPath(new URL('../../public/404.html', import.meta.url));
 
 async function urlRegisterController(req, res) {
     try {
@@ -114,10 +117,7 @@ async function redirectUrlController(req, res) {
 
         const url = await Url.findOne({ shortCode });
         if (!url) {
-            return res.status(404).json({
-                message: "URL not found",
-                success: false,
-            })
+            return res.status(404).sendFile(notFoundPage);
         }
 
         await Url.findOneAndUpdate({ shortCode }, { $inc: { clicks: 1 } }, { new: true });

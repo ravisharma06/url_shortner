@@ -7,6 +7,7 @@ const app = express();
 const notFoundPage = fileURLToPath(new URL('../public/404.html', import.meta.url));
 app.use(express.json());
 
+
 app.use(cors({
     origin: [
         'http://localhost:5173',
